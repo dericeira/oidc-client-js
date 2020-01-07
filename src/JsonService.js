@@ -28,6 +28,14 @@ export class JsonService {
     }
 
     getJson(url, token) {
+        
+        var method = "GET";
+        if (token) {
+            _Log.Log.debug("JsonService.getJson: token passed, setting Authorization header");
+            var params = 'access_token=' + token;
+            method = "POST";
+        }
+        
         if (!url){
             Log.error("JsonService.getJson: No url passed");
             throw new Error("url");
@@ -38,7 +46,7 @@ export class JsonService {
         return new Promise((resolve, reject) => {
 
             var req = new this._XMLHttpRequest();
-            req.open('GET', url);
+            req.open(method, url);
 
             var allowedContentTypes = this._contentTypes;
             var jwtHandler = this._jwtHandler;
@@ -89,7 +97,9 @@ export class JsonService {
 
             if (token) {
                 Log.debug("JsonService.getJson: token passed, setting Authorization header");
-                req.setRequestHeader("Authorization", "Bearer " + token);
+                //req.setRequestHeader("Authorization", "Bearer " + token);
+                req.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+                return req.send(params);
             }
 
             req.send();
